@@ -24,7 +24,7 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="fixed top-0 w-full h-20 bg-gradient-to-r from-[#006daa]/90 via-[#31b9d2]/90 to-[#9cd2d1]/90 backdrop-blur-lg border-b border-white/10 px-6 flex items-center justify-between z-50 shadow-lg">
+    <header className="fixed top-0 w-full bg-gradient-to-r from-[#006daa]/90 via-[#31b9d2]/90 to-[#9cd2d1]/90 backdrop-blur-lg border-b border-white/10 px-6 flex items-center justify-between z-50 shadow-lg h-[49px]">
       <div className="flex items-center gap-4">
         {isAuthenticated ? (
           <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>

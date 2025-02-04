@@ -9,6 +9,16 @@ import Layout from "@/components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 
+const SettingSwitch = ({ label, checked, onChange, Icon }) => (
+  <div className="flex items-center justify-between flex-row-reverse">
+    <Switch checked={checked} onCheckedChange={onChange} />
+    <div className="flex items-center gap-2">
+      <Label>{label}</Label>
+      <Icon className="h-5 w-5" />
+    </div>
+  </div>
+);
+
 export default function Settings() {
   const { user, updatePreferences, logout } = useAuth();
   const { permission, requestPermission } = useNotificationPermission();
@@ -24,9 +34,7 @@ export default function Settings() {
     async (checked) => {
       if (checked && permission !== "granted") {
         const result = await requestPermission();
-        if (result !== "granted") {
-          return;
-        }
+        if (result !== "granted") return;
       }
       try {
         await updatePreferences({ notifications: checked });
@@ -37,23 +45,12 @@ export default function Settings() {
     [permission, requestPermission, updatePreferences],
   );
 
-  const handleVibrationChange = useCallback(
-    async (checked) => {
+  const handlePreferenceChange = useCallback(
+    async (key, checked) => {
       try {
-        await updatePreferences({ vibration: checked });
+        await updatePreferences({ [key]: checked });
       } catch (error) {
-        console.error("Failed to update vibration preference:", error);
-      }
-    },
-    [updatePreferences],
-  );
-
-  const handleDarkModeChange = useCallback(
-    async (checked) => {
-      try {
-        await updatePreferences({ darkMode: checked });
-      } catch (error) {
-        console.error("Failed to update dark mode preference:", error);
+        console.error(`Failed to update ${key} preference:`, error);
       }
     },
     [updatePreferences],
@@ -83,42 +80,34 @@ export default function Settings() {
           <Card className="p-6 bg-gradient-to-br from-card/80 to-card/60 border border-white/5 rounded-3xl transition-all hover:shadow-[0_0_25px_rgba(139,92,246,0.2)] group relative overflow-hidden">
             <h2 className="text-lg font-semibold mb-4 text-right">התראות</h2>
             <div className="space-y-6">
-              <div className="flex items-center justify-between flex-row-reverse">
-                <Switch
-                  checked={preferences?.notifications}
-                  onCheckedChange={handleNotificationChange}
-                />
-                <div className="flex items-center gap-2">
-                  <Label>התראות על תנאי גלישה</Label>
-                  <Bell className="h-5 w-5" />
-                </div>
-              </div>
-              <div className="flex items-center justify-between flex-row-reverse">
-                <Switch
-                  checked={preferences?.vibration}
-                  onCheckedChange={handleVibrationChange}
-                />
-                <div className="flex items-center gap-2">
-                  <Label>רטט</Label>
-                  <Vibrate className="h-5 w-5" />
-                </div>
-              </div>
+              <SettingSwitch
+                label="התראות על תנאי גלישה"
+                checked={preferences?.notifications}
+                onChange={handleNotificationChange}
+                Icon={Bell}
+              />
+              <SettingSwitch
+                label="רטט"
+                checked={preferences?.vibration}
+                onChange={(checked) =>
+                  handlePreferenceChange("vibration", checked)
+                }
+                Icon={Vibrate}
+              />
             </div>
           </Card>
 
           <Card className="p-6 bg-gradient-to-br from-card/80 to-card/60 border border-white/5 rounded-3xl transition-all hover:shadow-[0_0_25px_rgba(139,92,246,0.2)] group relative overflow-hidden">
             <h2 className="text-lg font-semibold mb-4 text-right">תצוגה</h2>
             <div className="space-y-6">
-              <div className="flex items-center justify-between flex-row-reverse">
-                <Switch
-                  checked={preferences?.darkMode}
-                  onCheckedChange={handleDarkModeChange}
-                />
-                <div className="flex items-center gap-2">
-                  <Label>מצב לילה</Label>
-                  <Moon className="h-5 w-5" />
-                </div>
-              </div>
+              <SettingSwitch
+                label="מצב לילה"
+                checked={preferences?.darkMode}
+                onChange={(checked) =>
+                  handlePreferenceChange("darkMode", checked)
+                }
+                Icon={Moon}
+              />
             </div>
           </Card>
 
